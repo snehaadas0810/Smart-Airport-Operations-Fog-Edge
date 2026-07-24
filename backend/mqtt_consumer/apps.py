@@ -1,3 +1,5 @@
+import sys
+
 from django.apps import AppConfig
 
 
@@ -8,7 +10,11 @@ class MqttConsumerConfig(AppConfig):
     started = False
 
     def ready(self):
+        # Start the MQTT consumer only when running the Django development server
+        if "runserver" not in sys.argv:
+            return
 
+        # Prevent multiple starts in the same process
         if MqttConsumerConfig.started:
             return
 

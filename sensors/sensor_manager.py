@@ -1,22 +1,38 @@
 import threading
 
-from passenger_sensor import generate_passenger_data
-from queue_sensor import generate_queue_data
-from gate_sensor import generate_gate_data
-from temperature_sensor import generate_temperature
-from emergency_sensor import generate_emergency
+from passenger_sensor import PassengerSensor
+from queue_sensor import QueueSensor
+from gate_sensor import GateSensor
+from temperature_sensor import TemperatureSensor
+from emergency_sensor import EmergencySensor
 
 
-threads = [
-    threading.Thread(target=generate_passenger_data),
-    threading.Thread(target=generate_queue_data),
-    threading.Thread(target=generate_gate_data),
-    threading.Thread(target=generate_temperature),
-    threading.Thread(target=generate_emergency),
-]
+def run_sensor(sensor):
+    sensor.run()
 
-for thread in threads:
-    thread.start()
 
-for thread in threads:
-    thread.join()
+def main():
+    sensors = [
+        PassengerSensor(),
+        QueueSensor(),
+        GateSensor(),
+        TemperatureSensor(),
+        EmergencySensor(),
+    ]
+
+    threads = []
+
+    for sensor in sensors:
+        thread = threading.Thread(target=run_sensor, args=(sensor,))
+        thread.daemon = True
+        thread.start()
+        threads.append(thread)
+
+    print("✅ All sensors started successfully...")
+
+    for thread in threads:
+        thread.join()
+
+
+if __name__ == "__main__":
+    main()
